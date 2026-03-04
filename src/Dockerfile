@@ -18,7 +18,7 @@ RUN dotnet publish cartservice.csproj -c Release -o /app/publish
 # -----------------------------
 # Stage 2: Runtime Stage
 # -----------------------------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
 # Copy published output from build stage
