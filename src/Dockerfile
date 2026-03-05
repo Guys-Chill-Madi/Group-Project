@@ -7,5 +7,5 @@ RUN dotnet publish cartservice.csproj -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app/publish .
-EXPOSE 8080
+EXPOSE 7070
 ENTRYPOINT ["dotnet", "cartservice.dll"]
