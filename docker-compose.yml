@@ -52,10 +52,6 @@ services:
     networks: [appnet]
     ports:
       - "7000:7000"
-    environment:
-      PORT: "7000"
-      DISABLE_PROFILER: "1"
-      ENABLE_TRACING: "0"
 
   shippingservice:
     image: chillmadiguys/shippinservice:v1.1.0  
@@ -79,8 +75,8 @@ services:
       PORT: "50051"
       DISABLE_PROFILER: "1"     
       ENABLE_TRACING: "0"      
-      networks: [appnet]
-      ports:
+    networks: [appnet]
+    ports:
         - "50052:50051"
 
   cartservice:
@@ -145,4 +141,5 @@ services:
     networks: [appnet]
     ports:
       - "80:8080"
+
 
