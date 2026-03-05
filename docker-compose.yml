@@ -1,0 +1,145 @@
+name: online-boutique
+version: '3.8'
+
+networks:
+  appnet: {}
+
+volumes:
+  redisdata: {}
+
+services:
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    networks: [appnet]
+    ports:
+      - "6379:6379"
+
+ 
+  productcatalogservice:
+    image: chillmadiguys/productcatalog-image:v1.1.0
+    container_name: productcatalogservice
+    networks: [appnet]
+    ports:
+      - "3550:3550"
+
+  recommendationservice:
+    image: chillmadiguys/recommend-image:v1.1.0
+    container_name: recommendationservice
+    environment:
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+    depends_on:
+      - productcatalogservice
+    networks: [appnet]
+    ports:
+      - "8082:8080"
+
+  adservice:
+    image: chillmadiguys/adservice-msi:v1.1.0
+    container_name: adservice
+    networks: [appnet]
+    ports:
+      - "9555:9555"
+
+  currencyservice:
+    image: chillmadiguys/currencyservice:v1.1.0
+    container_name: currencyservice
+    networks: [appnet]
+    ports:
+      - "7000:7000"
+
+  shippingservice:
+    image: chillmadiguys/shippinservice:v1.1.0  
+    container_name: shippingservice
+    networks: [appnet]
+    ports:
+      - "50051:50051"
+
+  emailservice:
+    image: chillmadiguys/emailservice:v1.1.0
+    container_name: emailservice
+    networks: [appnet]
+    ports:
+      - "8081:8080"
+
+  
+  paymentservice:
+    image: chillmadiguys/paymentservice-msi:v1.1.0
+    container_name: paymentservice
+    environment:
+      PORT: "50051"
+      DISABLE_PROFILER: "1"     
+      ENABLE_TRACING: "0"      
+    networks: [appnet]
+    ports:
+        - "50052:50051"
+
+  cartservice:
+    image: chillmadiguys/cart-service:v1.1.0
+    container_name: cartservice
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:7070
+      REDIS_ADDR: redis:6379
+    depends_on:
+      - redis
+    networks: [appnet]
+    ports:
+      - "7070:7070"
+
+  checkoutservice:
+    image: chillmadiguys/checkoutservice:v1.1.0
+    container_name: checkoutservice
+    environment:
+      PORT: "5050"
+      CART_SERVICE_ADDR: cartservice:7070
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      CURRENCY_SERVICE_ADDR: currencyservice:7000
+      SHIPPING_SERVICE_ADDR: shippingservice:50051
+      PAYMENT_SERVICE_ADDR: paymentservice:50051
+      EMAIL_SERVICE_ADDR: emailservice:8080
+    depends_on:
+      - cartservice
+      - productcatalogservice
+      - currencyservice
+      - shippingservice
+      - paymentservice
+      - emailservice
+    networks: [appnet]
+    ports:
+      - "5050:5050"
+
+
+  
+  frontend:
+    image: chillmadiguys/frontend:v1.1.0
+    container_name: frontend
+    environment:
+      PORT: "8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      CURRENCY_SERVICE_ADDR: currencyservice:7000
+      CART_SERVICE_ADDR: cartservice:7070
+      RECOMMENDATION_SERVICE_ADDR: recommendationservice:8080
+      CHECKOUT_SERVICE_ADDR: checkoutservice:5050
+      AD_SERVICE_ADDR: adservice:9555
+      SHIPPING_SERVICE_ADDR: shippingservice:50051
+      PAYMENT_SERVICE_ADDR: paymentservice:50051
+      EMAIL_SERVICE_ADDR: emailservice:8080
+      SHOPPING_ASSISTANT_SERVICE_ADDR: shoppingassistantservice:8080   
+    depends_on:
+      - productcatalogservice
+      - currencyservice
+      - cartservice
+      - recommendationservice
+      - checkoutservice
+      - adservice
+      - emailservice
+    networks: [appnet]
+    ports:
+      - "80:8080"
+
+
