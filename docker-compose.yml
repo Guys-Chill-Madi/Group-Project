@@ -1,4 +1,5 @@
 name: online-boutique
+version: '3.8'
 
 networks:
   appnet: {}
@@ -8,7 +9,7 @@ volumes:
 
 services:
 
-  # -------------------- Infra --------------------
+
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -19,7 +20,7 @@ services:
     ports:
       - "6379:6379"
 
-  # -------------------- Core backends --------------------
+ 
   productcatalogservice:
     image: chillmadiguys/productcatalog-image:v1.1.0
     container_name: productcatalogservice
@@ -57,7 +58,7 @@ services:
       ENABLE_TRACING: "0"
 
   shippingservice:
-    image: chillmadiguys/shippinservice:v1.1.0   # FIX this if repo is 'shippingservice'
+    image: chillmadiguys/shippinservice:v1.1.0  
     container_name: shippingservice
     networks: [appnet]
     ports:
@@ -76,8 +77,8 @@ services:
     container_name: paymentservice
     environment:
       PORT: "50051"
-      DISABLE_PROFILER: "1"     # <--- disable GCP profiler
-      ENABLE_TRACING: "0"       # <--- optional; keep it off for simplicity
+      DISABLE_PROFILER: "1"     
+      ENABLE_TRACING: "0"      
       networks: [appnet]
       ports:
         - "50052:50051"
@@ -116,7 +117,7 @@ services:
     ports:
       - "5050:5050"
 
-  # -------------------- Frontend --------------------
+
   
   frontend:
     image: chillmadiguys/frontend:v1.1.0
@@ -132,7 +133,7 @@ services:
       SHIPPING_SERVICE_ADDR: shippingservice:50051
       PAYMENT_SERVICE_ADDR: paymentservice:50051
       EMAIL_SERVICE_ADDR: emailservice:8080
-      SHOPPING_ASSISTANT_SERVICE_ADDR: shoppingassistantservice:8080   # <-- ADD THIS
+      SHOPPING_ASSISTANT_SERVICE_ADDR: shoppingassistantservice:8080   
     depends_on:
       - productcatalogservice
       - currencyservice
@@ -144,3 +145,4 @@ services:
     networks: [appnet]
     ports:
       - "80:8080"
+
