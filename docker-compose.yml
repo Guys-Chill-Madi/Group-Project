@@ -73,8 +73,8 @@ services:
     container_name: paymentservice
     environment:
       PORT: "50051"
-      DISABLE_PROFILER: "1"     
-      ENABLE_TRACING: "0"      
+      # DISABLE_PROFILER: "1"     
+      # ENABLE_TRACING: "0"      
     networks: [appnet]
     ports:
         - "50052:50051"
@@ -141,5 +141,6 @@ services:
     networks: [appnet]
     ports:
       - "80:8080"
+
 
 
